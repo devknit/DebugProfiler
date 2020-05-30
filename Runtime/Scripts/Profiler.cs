@@ -62,7 +62,7 @@ namespace DebugProfiler
 
             float totalTime = Framework.GetLastExecuteTime();
 		#if UNITY_ANDROID && !UNITY_EDITOR
-            if( SystemInfo.graphicsMultiThreaded != false)
+            if( SystemInfo.graphicsMultiThreaded != false && deductAnderoidGfxWait != false)
             {
                 totalTime -= Framework.GetGfxWaitForPresent();
             }
@@ -107,7 +107,7 @@ namespace DebugProfiler
             float renderTime = Framework.GetProfilingTime<UnityEngine.PlayerLoop.PostLateUpdate.FinishFrameRendering>();
             float physicsTime = Framework.GetProfilingTime<UnityEngine.PlayerLoop.FixedUpdate.PhysicsFixedUpdate>();
 		#if UNITY_ANDROID && !UNITY_EDITOR
-            if( SystemInfo.graphicsMultiThreaded != false)
+            if( SystemInfo.graphicsMultiThreaded != false && deductAnderoidGfxWait != false)
             {
                 float waitForGfxPresent = Framework.GetGfxWaitForPresent();
                 renderTime -= waitForGfxPresent;
@@ -134,7 +134,10 @@ namespace DebugProfiler
 	            float cameraRenderTime = recordCamerRender.elapsedNanoseconds * 0.000000001f;
 	            float mainThreadTime = Framework.GetProfilingTime<UnityEngine.PlayerLoop.PostLateUpdate.FinishFrameRendering>();
 			#if UNITY_ANDROID && !UNITY_EDITOR
-	            mainThreadTime -= Framework.GetGfxWaitForPresent();
+				if( deductAnderoidGfxWait != false)
+				{
+	            	mainThreadTime -= Framework.GetGfxWaitForPresent();
+	            }
 			#endif
 	            float renderThreadTime = cameraRenderTime - mainThreadTime;
 	            renderThreadMeter.SetParameter( 0, renderThreadTime / expectedExecuteTime);
@@ -185,6 +188,8 @@ namespace DebugProfiler
         Meter mainThreadMeter = default;
         [SerializeField]
         Meter renderThreadMeter = default;
+        [SerializeField]
+        bool deductAnderoidGfxWait = false;
 
         StringBuilder stringBuilderBuffer = new StringBuilder();
         Recorder recordCamerRender;
