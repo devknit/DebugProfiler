@@ -172,6 +172,7 @@ namespace DebugProfiler
 		}
 	#endif
 		
+		#pragma warning disable 0414
 		const int kMeterIndexScript = 0;
         const int kMeterIndexPhysics = 1;
         const int kMeterIndexAnimator = 2;
